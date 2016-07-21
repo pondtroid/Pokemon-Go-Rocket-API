@@ -29,7 +29,27 @@ namespace PokemonGo.RocketAPI.Logging
 			if (level > maxLogLevel)
 				return;
 
-			Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] { message}");
+		    switch (level)
+		    {
+		        case LogLevel.None:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] { message}");
+                    break;
+		        case LogLevel.Error:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] (ERROR) { message}");
+                    break;
+		        case LogLevel.Warning:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] (WARNING) { message}");
+                    break;
+		        case LogLevel.Info:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] (INFO) { message}");
+                    break;
+		        case LogLevel.Debug:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] (DEBUG) { message}");
+                    break;
+		        default:
+                    Console.WriteLine($"[{ DateTime.Now.ToString("HH:mm:ss")}] { message}");
+		            break;
+		    }
 		}
 	}
 }
