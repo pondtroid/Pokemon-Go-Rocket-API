@@ -8,7 +8,6 @@ using PokemonGo.RocketAPI.Enums;
 using PokemonGo.RocketAPI.Extensions;
 using PokemonGo.RocketAPI.GeneratedCode;
 using PokemonGo.RocketAPI.Logic.Utils;
-using PokemonGo.RocketAPI.Updater;
 
 namespace PokemonGo.RocketAPI.Logic
 {
@@ -27,8 +26,6 @@ namespace PokemonGo.RocketAPI.Logic
 
         public async void Execute()
         {
-            //Check for Updates
-            await Task.Run(Git.CheckVersion);
 
             Logger.Write($"Starting Execute on login server: {_clientSettings.AuthType}", LogLevel.Info);
 
@@ -106,8 +103,7 @@ namespace PokemonGo.RocketAPI.Logic
 
                 if (pokeball == MiscEnums.Item.ITEM_UNKNOWN)
                 {
-                    Logger.Write("no pokeball available :(", LogLevel.Info);
-                    return;
+                    Logger.Write($"You don't own any Pokeballs :( - We missed a {pokemon.PokemonId} with CP {encounterPokemonResponse?.WildPokemon?.PokemonData?.Cp}", LogLevel.Info); return;
                 }
 
                 CatchPokemonResponse caughtPokemonResponse;
