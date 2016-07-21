@@ -97,6 +97,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Login\GoogleLogin.cs" />
     <Compile Include="Login\PtcLogin.cs" />
+    <Compile Include="Updater\Git.cs" />
     <None Include="app.config" />
     <Compile Include="Client.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />

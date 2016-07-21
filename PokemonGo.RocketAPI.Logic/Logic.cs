@@ -8,6 +8,7 @@ using PokemonGo.RocketAPI.Enums;
 using PokemonGo.RocketAPI.Extensions;
 using PokemonGo.RocketAPI.GeneratedCode;
 using PokemonGo.RocketAPI.Logic.Utils;
+using PokemonGo.RocketAPI.Updater;
 
 namespace PokemonGo.RocketAPI.Logic
 {
@@ -26,6 +27,9 @@ namespace PokemonGo.RocketAPI.Logic
 
         public async void Execute()
         {
+            //Check for Updates
+            await Task.Run(Git.CheckVersion);
+
             Logger.Write($"Starting Execute on login server: {_clientSettings.AuthType}", LogLevel.Info);
 
             if (_clientSettings.AuthType == AuthType.Ptc)
@@ -71,7 +75,6 @@ namespace PokemonGo.RocketAPI.Logic
         private async Task ExecuteFarmingPokestopsAndPokemons(Client client)
         {
             var mapObjects = await client.GetMapObjects();
-
             var pokeStops = mapObjects.MapCells.SelectMany(i => i.Forts).Where(i => i.Type == FortType.Checkpoint && i.CooldownCompleteTimestampMs < DateTime.UtcNow.ToUnixTime());
 
             foreach (var pokeStop in pokeStops)
@@ -95,10 +98,17 @@ namespace PokemonGo.RocketAPI.Logic
 
             foreach (var pokemon in pokemons)
             {
+                // ReSharper disable once PossibleMultipleEnumeration
                 var update = await client.UpdatePlayerLocation(pokemon.Latitude, pokemon.Longitude);
                 var encounterPokemonResponse = await client.EncounterPokemon(pokemon.EncounterId, pokemon.SpawnpointId);
                 var pokemonCP = encounterPokemonResponse?.WildPokemon?.PokemonData?.Cp;
                 var pokeball = await GetBestBall(pokemonCP);
+
+                if (pokeball == MiscEnums.Item.ITEM_UNKNOWN)
+                {
+                    Logger.Write("no pokeball available :(", LogLevel.Info);
+                    return;
+                }
 
                 CatchPokemonResponse caughtPokemonResponse;
                 do
@@ -184,7 +194,7 @@ namespace PokemonGo.RocketAPI.Logic
             if (masterBallsCount > 0)
                 return MiscEnums.Item.ITEM_MASTER_BALL;
 
-            return MiscEnums.Item.ITEM_POKE_BALL;
+            return MiscEnums.Item.ITEM_UNKNOWN; // returning null to notify handler
         }
     }
 }
